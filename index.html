@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIOROBOTEC — Çok Yakında</title>
+<meta name="description" content="BIOROBOTEC insansı robot kafası çok yakında. Lansmandan ilk siz haberdar olun.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1113;
+    --card: #181b1f;
+    --field: #0f1113;
+    --ink: #f2f0ec;
+    --muted: #a9a6a0;
+    --accent: #7fa6ff;
+    --line: #ffffff1a;
+    --error: #ff8a80;
+    --ok: #7ddc9a;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .robot-wrap {
+    position: relative;
+    height: 100vh; height: 100svh;
+    aspect-ratio: 2 / 3;
+    max-width: 100vw;
+    margin-right: max(0px, calc((100vw - 1400px) / 2));
+  }
+  #robot, #robotFallback {
+    position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  }
+  #robotFallback { object-fit: cover; }
+
+  header {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px clamp(16px, 5vw, 64px);
+  }
+  .brand { font-weight: 700; letter-spacing: .2em; font-size: 15px; }
+
+  .copy {
+    position: absolute; z-index: 2;
+    left: clamp(16px, 5vw, 64px); top: 50%; transform: translateY(-50%);
+    max-width: 480px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  .eyebrow::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: .3; } }
+  h1 { font-size: clamp(40px, 5.6vw, 76px); line-height: 1.02; margin: 0 0 20px; letter-spacing: -.02em; }
+  .lead { font-size: 18px; color: var(--muted); margin: 0 0 28px; }
+  .cta {
+    display: inline-block; background: var(--ink); color: var(--bg); border: 0; cursor: pointer;
+    font: inherit; font-weight: 500; font-size: 16px;
+    padding: 15px 26px; border-radius: 999px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .cta:hover { transform: translateY(-1px); box-shadow: 0 10px 30px -10px #fff6; }
+  .hint { margin-top: 18px; font-size: 14px; color: var(--muted); }
+
+  .foot {
+    position: absolute; z-index: 2; left: clamp(16px, 5vw, 64px); bottom: 22px;
+    font-size: 13px; color: var(--muted);
+  }
+
+  /* --- kayıt penceresi --- */
+  dialog {
+    width: min(420px, calc(100vw - 32px));
+    padding: 0; border: 1px solid var(--line); border-radius: 20px;
+    background: var(--card); color: var(--ink);
+    box-shadow: 0 40px 80px -20px #000;
+  }
+  dialog::backdrop { background: #000a; backdrop-filter: blur(4px); }
+  dialog[open] { animation: pop .18s ease-out; }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+  .modal { padding: 28px 24px 24px; position: relative; }
+  .modal h2 { margin: 0 0 6px; font-size: 24px; letter-spacing: -.01em; }
+  .modal .sub { margin: 0 0 22px; color: var(--muted); font-size: 15px; }
+  .close {
+    position: absolute; top: 14px; right: 14px; width: 34px; height: 34px;
+    border: 0; border-radius: 50%; background: transparent; color: var(--muted);
+    font-size: 22px; line-height: 1; cursor: pointer;
+  }
+  .close:hover { background: var(--line); color: var(--ink); }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .field input {
+    width: 100%; padding: 12px 14px; font: inherit; font-size: 16px;
+    color: var(--ink); background: var(--field);
+    border: 1px solid var(--line); border-radius: 12px; outline: none;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .field.invalid input { border-color: var(--error); }
+  .field .err { display: none; color: var(--error); font-size: 12px; margin-top: 5px; }
+  .field.invalid .err { display: block; }
+  .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); margin: 4px 0 18px; }
+  .consent input { margin-top: 3px; accent-color: var(--accent); }
+  .consent.invalid { color: var(--error); }
+  .submit { width: 100%; }
+  .submit[disabled] { opacity: .6; cursor: default; transform: none; box-shadow: none; }
+  .form-error { color: var(--error); font-size: 14px; margin: 12px 0 0; text-align: center; }
+  .done { text-align: center; padding: 12px 0 4px; }
+  .done .check {
+    width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%;
+    display: grid; place-items: center; background: #7ddc9a22; color: var(--ok); font-size: 28px;
+  }
+
+  @media (max-width: 900px) {
+    .hero { flex-direction: column; justify-content: flex-start; }
+    .robot-wrap { width: 100vw; height: auto; margin: 0; }
+    .copy {
+      position: relative; top: auto; left: auto; transform: none;
+      margin: -80px 16px 64px; text-align: center; max-width: none;
+    }
+    .foot { left: 0; right: 0; text-align: center; bottom: 18px; }
+  }
+</style>
+</head>
+<body>
+  <section class="hero">
+    <header>
+      <div class="brand">BIOROBOTEC</div>
+    </header>
+
+    <div class="robot-wrap">
+      <img id="robotFallback" alt="BIOROBOTEC insansı robot kafası" hidden>
+      <canvas id="robot" aria-label="İmleci gözleriyle takip eden robot"></canvas>
+    </div>
+
+    <div class="copy">
+      <span class="eyebrow">Çok yakında</span>
+      <h1>Sizi görüyor.<br>Yakında tanışıyoruz.</h1>
+      <p class="lead">Atölyemizde tasarlayıp ürettiğimiz insansı robot kafası lansmana hazırlanıyor. İlk haberdar olanlardan olun.</p>
+      <button class="cta" id="notifyBtn" type="button">Gelince haber ver</button>
+      <p class="hint">İmleci hareket ettirin, gözleriyle sizi takip etsin.</p>
+    </div>
+
+    <div class="foot">© 2026 BIOROBOTEC</div>
+  </section>
+
+  <dialog id="notifyDialog" aria-labelledby="dlgTitle">
+    <div class="modal">
+      <button class="close" type="button" aria-label="Kapat" data-close>&times;</button>
+
+      <form id="notifyForm" novalidate>
+        <h2 id="dlgTitle">Gelince haber verelim</h2>
+        <p class="sub">Lansman günü ilk size haber verelim.</p>
+
+        <div class="field">
+          <label for="fName">Ad Soyad</label>
+          <input id="fName" name="name" autocomplete="name" required>
+          <div class="err">Lütfen adınızı ve soyadınızı yazın.</div>
+        </div>
+        <div class="field">
+          <label for="fEmail">E-posta</label>
+          <input id="fEmail" name="email" type="email" autocomplete="email" inputmode="email" required>
+          <div class="err">Geçerli bir e-posta adresi yazın.</div>
+        </div>
+        <div class="field">
+          <label for="fPhone">Telefon</label>
+          <input id="fPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="05xx xxx xx xx" required>
+          <div class="err">Geçerli bir telefon numarası yazın.</div>
+        </div>
+        <label class="consent" id="consentRow">
+          <input type="checkbox" id="fConsent" name="consent">
+          <span>Bilgilerimin lansman duyurusu için KVKK kapsamında işlenmesini kabul ediyorum.</span>
+        </label>
+
+        <button class="cta submit" type="submit">Kaydol</button>
+        <p class="form-error" id="formError" hidden>Bir sorun oluştu, lütfen tekrar deneyin.</p>
+      </form>
+
+      <div class="done" id="notifyDone" hidden>
+        <div class="check">✓</div>
+        <h2>Teşekkürler!</h2>
+        <p class="sub">Lansman günü size haber vereceğiz.</p>
+        <button class="cta" type="button" data-close>Tamam</button>
+      </div>
+    </div>
+  </dialog>
+
+<script src="assets/images.js"></script>
+<script>
+// Kayıtların gönderileceği adres (ör. Formspree: https://formspree.io/f/XXXXXXX).
+// Boş bırakılırsa kayıtlar yalnızca bu tarayıcıda saklanır (test için).
+const FORM_ENDPOINT = '';
+
+(() => {
+  const dlg = document.getElementById('notifyDialog');
+  const form = document.getElementById('notifyForm');
+  const done = document.getElementById('notifyDone');
+  const formError = document.getElementById('formError');
+  const submitBtn = form.querySelector('.submit');
+
+  document.getElementById('notifyBtn').addEventListener('click', () => {
+    form.hidden = false; done.hidden = true; formError.hidden = true;
+    dlg.showModal();
+    document.getElementById('fName').focus();
+  });
+  dlg.addEventListener('click', e => {
+    if (e.target === dlg || e.target.closest('[data-close]')) dlg.close();
+  });
+
+  const rules = {
+    fName: v => v.trim().split(/\s+/).filter(Boolean).length >= 2,
+    fEmail: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()),
+    fPhone: v => { const n = v.replace(/\D/g, ''); return n.length >= 10 && n.length <= 13; },
+  };
+  const check = id => {
+    const input = document.getElementById(id);
+    const ok = rules[id](input.value);
+    input.closest('.field').classList.toggle('invalid', !ok);
+    return ok;
+  };
+  Object.keys(rules).forEach(id => {
+    const input = document.getElementById(id);
+    input.addEventListener('blur', () => input.value && check(id));
+    input.addEventListener('input', () => {
+      if (input.closest('.field').classList.contains('invalid')) check(id);
+    });
+  });
+  const consent = document.getElementById('fConsent');
+  consent.addEventListener('change', () => document.getElementById('consentRow').classList.remove('invalid'));
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    formError.hidden = true;
+    const valid = Object.keys(rules).map(check).every(Boolean);
+    document.getElementById('consentRow').classList.toggle('invalid', !consent.checked);
+    if (!valid || !consent.checked) return;
+
+    const data = {
+      name: form.elements.name.value.trim(),
+      email: form.elements.email.value.trim(),
+      phone: form.elements.phone.value.trim(),
+      date: new Date().toISOString(),
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Gönderiliyor…';
+    try {
+      if (FORM_ENDPOINT) {
+        const res = await fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error(res.status);
+      } else {
+        console.warn('FORM_ENDPOINT ayarlı değil; kayıt yalnızca bu tarayıcıda saklandı.', data);
+        try {
+          const list = JSON.parse(localStorage.getItem('notifyList') || '[]');
+          list.push(data);
+          localStorage.setItem('notifyList', JSON.stringify(list));
+        } catch {}
+      }
+      form.reset();
+      form.hidden = true;
+      done.hidden = false;
+    } catch {
+      formError.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Kaydol';
+    }
+  });
+})();
+
+(() => {
+  const IMG = window.ROBOT_IMG;
+  const W = 720, H = 1080;              // kaynak görsel boyutu
+  const EYES = [
+    { c: [255, 474], top: 449, h: 74 }, // sol göz (görsele göre)
+    { c: [505, 474], top: 448, h: 79 }, // sağ göz
+  ];
+  const MAX_X = 22, MAX_Y = 11;         // gözbebeği hareket sınırı (px)
+
+  const canvas = document.getElementById('robot');
+  const gl = canvas.getContext('webgl', { premultipliedAlpha: false, antialias: false });
+  if (!gl) {
+    const img = document.getElementById('robotFallback');
+    img.src = IMG.orig; img.hidden = false; canvas.hidden = true;
+    return;
+  }
+
+  const vs = `
+    attribute vec2 aPos;
+    varying vec2 vUv;
+    void main() { vUv = aPos * 0.5 + 0.5; gl_Position = vec4(aPos, 0.0, 1.0); }`;
+
+  const fs = `
+    precision highp float;
+    uniform sampler2D uBase, uOrig, uMask;
+    uniform vec2 uSize;
+    uniform float uBlink;
+    uniform vec2 uOff0, uOff1;
+    uniform vec2 uC0, uC1;
+    uniform vec2 uLid0, uLid1;   // (üst kenar, yükseklik)
+    uniform vec2 uFade;          // (yan kenar, alt kenar) sayfa rengine erime
+    varying vec2 vUv;
+
+    vec4 tex(sampler2D t, vec2 p) { return texture2D(t, clamp(p, vec2(0.5), uSize - 0.5) / uSize); }
+    float lum(vec3 c) { return dot(c, vec3(0.299, 0.587, 0.114)); }
+
+    vec3 iris(vec3 col, vec2 q, float m, vec2 c, vec2 o) {
+      // göz küresi: kenara gittikçe gözbebeği basıklaşır
+      vec2 sc = vec2(1.0 - 0.2 * abs(o.x) / ${MAX_X}.0, 1.0 - 0.2 * abs(o.y) / ${MAX_Y}.0);
+      vec2 local = (q - c - o) / sc;
+      float r = length(local);
+      float a = (1.0 - smoothstep(27.0, 29.5, r)) * m;
+      if (a <= 0.0) return col;
+      vec2 src = c + local;
+      vec3 ic = tex(uOrig, src).rgb;
+      float shade = clamp(lum(tex(uBase, q).rgb) / max(lum(tex(uBase, src).rgb), 0.02), 0.5, 1.15);
+      return mix(col, ic * shade, a);
+    }
+
+    void main() {
+      vec2 q = vec2(vUv.x, 1.0 - vUv.y) * uSize;
+
+      vec3 col = tex(uBase, q).rgb;
+      float m = tex(uMask, q).r;
+      col = iris(col, q, m, uC0, uOff0);
+      col = iris(col, q, m, uC1, uOff1);
+
+      // göz kırpma: göz boşluğu, üstündeki kapak dokusuyla örtülür
+      if (uBlink > 0.0 && m > 0.0) {
+        vec2 lid = q.x < 380.0 ? uLid0 : uLid1;
+        float shift = uBlink * lid.y;
+        float edge = lid.x + shift;
+        float cover = 1.0 - smoothstep(edge - 1.0, edge + 1.0, q.y);
+        vec3 lc = tex(uOrig, vec2(q.x, q.y - shift)).rgb;
+        col = mix(col, lc, cover * m);
+      }
+
+      float e = mix(1.0, smoothstep(0.0, 0.24, vUv.x) * smoothstep(1.0, 0.86, vUv.x), uFade.x);
+      e *= mix(1.0, smoothstep(0.0, 0.18, vUv.y), uFade.y);
+      col = mix(vec3(15.0, 17.0, 19.0) / 255.0, col, e);
+      gl_FragColor = vec4(col, 1.0);
+    }`;
+
+  function shader(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src); gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
+    return sh;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, 'aPos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  const U = name => gl.getUniformLocation(prog, name);
+  gl.uniform2f(U('uSize'), W, H);
+  gl.uniform2f(U('uC0'), ...EYES[0].c);
+  gl.uniform2f(U('uC1'), ...EYES[1].c);
+  gl.uniform2f(U('uLid0'), EYES[0].top, EYES[0].h);
+  gl.uniform2f(U('uLid1'), EYES[1].top, EYES[1].h);
+  const uBlink = U('uBlink'), uOff0 = U('uOff0'), uOff1 = U('uOff1');
+
+  function loadTex(src, unit, name) {
+    return new Promise(res => {
+      const img = new Image();
+      img.onload = () => {
+        const t = gl.createTexture();
+        gl.activeTexture(gl.TEXTURE0 + unit);
+        gl.bindTexture(gl.TEXTURE_2D, t);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        gl.uniform1i(U(name), unit);
+        res();
+      };
+      img.src = src;
+    });
+  }
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = canvas.getBoundingClientRect();
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform2f(U('uFade'), matchMedia('(max-width: 900px)').matches ? 0 : 1, 1);
+  }
+  window.addEventListener('resize', resize);
+
+  // --- imleç takibi ---
+  let pointer = null, lastMove = -1e9;
+  const track = e => { pointer = { x: e.clientX, y: e.clientY }; lastMove = performance.now(); };
+  window.addEventListener('pointermove', track);
+  window.addEventListener('pointerdown', track);
+  document.documentElement.addEventListener('pointerleave', () => { lastMove = -1e9; });
+
+  // imleç yokken rastgele etrafa bakınır
+  let idleTarget = { x: 0, y: 0 }, nextIdle = 0;
+  const off = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
+  let blinkStart = -1, nextBlink = performance.now() + 1800;
+
+  function frame(now) {
+    const idle = now - lastMove > 3000;
+    if (idle && now > nextIdle) {
+      idleTarget = Math.random() < 0.4
+        ? { x: 0, y: 0 }
+        : { x: (Math.random() * 2 - 1) * MAX_X * 0.8, y: (Math.random() * 2 - 1) * MAX_Y * 0.6 };
+      nextIdle = now + 1200 + Math.random() * 2200;
+    }
+
+    const r = canvas.getBoundingClientRect();
+    EYES.forEach((eye, i) => {
+      let tx, ty;
+      if (idle || !pointer) {
+        tx = idleTarget.x; ty = idleTarget.y;
+      } else {
+        const ex = r.left + eye.c[0] / W * r.width;
+        const ey = r.top + eye.c[1] / H * r.height;
+        const dx = pointer.x - ex, dy = pointer.y - ey;
+        const dist = Math.hypot(dx, dy) || 1;
+        const k = dist / (dist + 90);
+        tx = dx / dist * k * MAX_X;
+        ty = dy / dist * k * MAX_Y;
+      }
+      off[i].x += (tx - off[i].x) * 0.28;
+      off[i].y += (ty - off[i].y) * 0.28;
+    });
+
+    if (now > nextBlink && blinkStart < 0) blinkStart = now;
+    let blink = 0;
+    if (blinkStart >= 0) {
+      const t = (now - blinkStart) / 170;
+      if (t >= 1) {
+        blinkStart = -1;
+        nextBlink = now + (Math.random() < 0.18 ? 250 : 2400 + Math.random() * 3600);
+      } else blink = Math.sin(t * Math.PI);
+    }
+
+    gl.uniform1f(uBlink, blink);
+    gl.uniform2f(uOff0, off[0].x, off[0].y);
+    gl.uniform2f(uOff1, off[1].x, off[1].y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(frame);
+  }
+
+  Promise.all([
+    loadTex(IMG.base, 0, 'uBase'),
+    loadTex(IMG.orig, 1, 'uOrig'),
+    loadTex(IMG.mask, 2, 'uMask'),
+  ]).then(() => { resize(); requestAnimationFrame(frame); });
+})();
+</script>
+</body>
+</html>
